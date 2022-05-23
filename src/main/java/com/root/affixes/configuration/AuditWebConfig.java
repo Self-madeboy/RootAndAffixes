@@ -9,7 +9,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 /**
  * WebConfigAdapter
  *
- * @author Du Ping
+ * @author jc
  * @date 2018-09-21
  */
 @Configuration

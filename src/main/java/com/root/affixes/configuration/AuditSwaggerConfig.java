@@ -55,94 +55,6 @@ public class AuditSwaggerConfig implements WebMvcConfigurer {
 
     private static final String PROJECT_API_PACKAGE = "com.root.affixes.controller";
 
-    private final TypeResolver typeResolver;
-
-    @Autowired
-    public AuditSwaggerConfig(TypeResolver typeResolver) {
-        this.typeResolver = typeResolver;
-    }
-
-
-    @Bean
-    public Docket graphApi() {
-        return this.commonApi("graph Management", PROJECT_API_PACKAGE + ".graph", false);
-    }
-
-    private Docket commonApi(String groupName, String basePackage, boolean requireToken) {
-        return this.buildApiCommonPart(new Docket(DocumentationType.SWAGGER_2)
-                .groupName(groupName)
-                .apiInfo(apiInfo())
-                .select()
-                .apis(RequestHandlerSelectors.basePackage(basePackage)), requireToken);
-    }
-
-    private Docket buildApiCommonPart(ApiSelectorBuilder builder, boolean requireToken) {
-        Docket docket = builder.paths(PathSelectors.any())
-                .build()
-                .consumes(
-                        Stream.of(MediaType.APPLICATION_JSON_UTF8_VALUE)
-                                .collect(Collectors.toSet()))
-                .produces(
-                        Stream.of(MediaType.APPLICATION_JSON_UTF8_VALUE)
-                                .collect(Collectors.toSet()));
-
-        if (requireToken) {
-            docket.globalOperationParameters(
-                    Stream.of(
-                            new ParameterBuilder()
-                                    .name(TOKEN_HEADER)
-                                    .modelRef(new ModelRef("string"))
-                                    .parameterType("header")
-                                    .required(true)
-                                    .description("JWT令牌")
-                                    .defaultValue(TOKEN_TYPE + " ")
-                                    .build()
-                    ).collect(Collectors.toList()));
-        }
-//        docket.globalOperationParameters(
-//                Stream.of(
-//                        new ParameterBuilder()
-//                                .name(WORKING_ORGANIZATION)
-//                                .modelRef(new ModelRef("string"))
-//                                .parameterType("header")
-//                                .required(false)
-//                                .description("当前工作组织")
-//                                .build()
-//                ).collect(Collectors.toList()));
-
-//        docket.globalOperationParameters(
-//                Stream.of(
-//                        new ParameterBuilder()
-//                                .name(USER_TYPE)
-//                                .modelRef(new ModelRef("string"))
-//                                .parameterType("header")
-//                                .required(false)
-//                                .description("当前用户类型")
-//                                .build()
-//                ).collect(Collectors.toList()));
-//
-//        docket.globalOperationParameters(
-//                Stream.of(
-//                        new ParameterBuilder()
-//                                .name(BUDGET_UNIT_ID)
-//                                .modelRef(new ModelRef("string"))
-//                                .parameterType("header")
-//                                .required(false)
-//                                .description("当前被审单位id（当用户类型为被审单位用户才有值）")
-//                                .build()
-//                ).collect(Collectors.toList()));
-
-
-        // 潜在的功能enableUrlTemplating（将来可能不被支持），开启不同的查询参数生成不同的API
-        return docket.pathMapping("/")
-//                .additionalModels(typeResolver.resolve(CommonErrorDTO.class))
-                .useDefaultResponseMessages(false)
-                .globalResponseMessage(RequestMethod.GET, responseMessages())
-                .globalResponseMessage(RequestMethod.PUT, responseMessages())
-                .globalResponseMessage(RequestMethod.POST, responseMessages())
-                .globalResponseMessage(RequestMethod.DELETE, responseMessages());
-    }
-
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
@@ -154,81 +66,16 @@ public class AuditSwaggerConfig implements WebMvcConfigurer {
                 .build();
     }
 
-    private List<ResponseMessage> responseMessages() {
-        return Stream.of(
-                new ResponseMessageBuilder()
-                        .code(HttpStatus.BAD_REQUEST.value())
-                        .message(HttpStatus.BAD_REQUEST.getReasonPhrase())
-                        .responseModel(new ModelRef(COMMON_ERROR_CLASS))
-                        .build(),
-                new ResponseMessageBuilder()
-                        .code(HttpStatus.UNAUTHORIZED.value())
-                        .message(HttpStatus.UNAUTHORIZED.getReasonPhrase())
-                        .responseModel(new ModelRef(COMMON_ERROR_CLASS))
-                        .build(),
-                new ResponseMessageBuilder()
-                        .code(HttpStatus.NOT_FOUND.value())
-                        .message(HttpStatus.NOT_FOUND.getReasonPhrase())
-                        .responseModel(new ModelRef(COMMON_ERROR_CLASS))
-                        .build(),
-                new ResponseMessageBuilder()
-                        .code(HttpStatus.FORBIDDEN.value())
-                        .message(HttpStatus.FORBIDDEN.getReasonPhrase())
-                        .responseModel(new ModelRef(COMMON_ERROR_CLASS))
-                        .build(),
-                new ResponseMessageBuilder()
-                        .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                        .message(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
-                        .responseModel(new ModelRef(COMMON_ERROR_CLASS))
-                        .build()).collect(Collectors.toList());
-    }
-
     @Bean
     public Docket createRestApi() {
-
-        ParameterBuilder tokenPar = new ParameterBuilder();
-        List<Parameter> pars = new ArrayList<>();
-        tokenPar.name("Authorization").description("令牌").
-                modelRef(new ModelRef("string")).
-                parameterType("header").required(false).build();
-
-        pars.add(tokenPar.build());
-
-        return new Docket(DocumentationType.SWAGGER_2).apiInfo(apiInfo()).select()
-                // .apis(RequestHandlerSelectors.basePackage("com.open.capacity"))
-                .apis(RequestHandlerSelectors.any())
-                .paths(input -> PathSelectors.regex("/user.*").apply(input) || PathSelectors.regex("/permissions.*").apply(input)
-                        || PathSelectors.regex("/roles.*").apply(input) || PathSelectors.regex("/test.*").apply(input)
-                )
-                // .paths(PathSelectors.any())
-                .build().globalOperationParameters(pars);
+        return new Docket(DocumentationType.SWAGGER_2)
+                .apiInfo(apiInfo())
+                .select()
+                //这里写的是API接口所在的包位置
+                .apis(RequestHandlerSelectors.basePackage("com.root.affixes.controller"))
+                .paths(PathSelectors.any())
+                .build();
     }
 
-    @Bean
-    public ViewResolver viewResolver() {
-        InternalResourceViewResolver resolver = new InternalResourceViewResolver();
-        resolver.setViewClass(JstlView.class);
-        resolver.setPrefix("/");
-        resolver.setSuffix(".html");
-        return resolver;
-    }
-
-    @Bean
-    public MessageSource messageSource() {
-        ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
-        messageSource.setBasename("messages");
-        return messageSource;
-    }
-
-    @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
-        registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
-    }
-
-    @Override
-    public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
-        configurer.enable();
-    }
 
 }

@@ -14,7 +14,6 @@ server:
     address: 0.0.0.0
     servlet:
         context-path: /ra-english/server/
-
 #logging:
 #level:
 #root: INFO
