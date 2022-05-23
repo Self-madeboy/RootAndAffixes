@@ -1,0 +1,105 @@
+spring:
+    profiles:
+        active: development-local-test
+    servlet:
+        multipart:
+            max-file-size: 1024MB
+            max-request-size: 1024MB
+    cache:
+        ehcache:
+            config: classpath:config/ehcache.xml
+
+server:
+    port: 8088
+    address: 0.0.0.0
+    servlet:
+        context-path: /ra-english/server/
+
+#logging:
+#level:
+#root: INFO
+#    config: classpath:config/log4j2-development.xml
+
+
+
+---  #分割线，代表着线以上是一个环境，线一下是一个环
+spring:
+    profiles: development-local-test
+    datasource:
+        name: MYDB
+        #schema: classpath:/sql/schema-mysql.sql
+        #    data: classpath:/sql/data-mysql.sql
+#        sql-script-encoding: utf-8
+#        driver-class-name: jdbc:mysql://localhost:3306/test
+        url: jdbc:mysql://110.42.136.104:3306/RAATest
+        username: root
+        password: qwerty
+    jpa:
+        open-in-view: false
+        show-sql: true
+        hibernate:
+            ddl-auto: update # Hibernate ddl auto (none, create, create-drop, update, validate)
+        properties:
+            hibernate.dialect: org.hibernate.dialect.MySQL5Dialect
+#            hibernate.dialect: org.hibernate.dialect.Oracle10gDialect
+            hibernate.format_sql: true
+            hibernate.max_fetch_depth: 1
+            hibernate.generate_statistics: false
+            hibernate.use_sql_comments: true
+            hibernate.default_schema: jhaudit
+    thymeleaf:
+        mode: HTML
+        encoding: UTF-8
+        cache: false
+    data:
+        neo4j:
+            uri: bolt://110.42.136.104:7687
+            username: neo4j
+            password: Jc121128
+
+#        elasticsearch:
+#            cluster-name: my-application
+#            cluster-nodes: 100.75.119.104:9300
+#            repositories:
+#                enabled: true
+#        neo4j:
+#            uri: bolt://110.42.136.104:7687
+#            username: neo4j
+#            password: @Jc121128
+#    elasticsearch:
+#        rest:
+#            uris: http://100.75.119.104:9200
+swagger:
+    title: 词根词缀
+    description: About English
+    version: 1.0.0
+
+---  #分割线，代表着线以上是一个环境，线一下是一个环
+spring:
+    profiles: development-local
+    datasource:
+        name: MYDB
+        #schema: classpath:/sql/schema-mysql.sql
+        #    data: classpath:/sql/data-mysql.sql
+        #        sql-script-encoding: utf-8
+        #        driver-class-name: jdbc:mysql://localhost:3306/test
+        url: jdbc:mysql://100.42.136.104:3306/RAATest
+        username: root
+        password: qwerty
+    jpa:
+        open-in-view: false
+        show-sql: true
+        hibernate:
+            ddl-auto: update # Hibernate ddl auto (none, create, create-drop, update, validate)
+        properties:
+            hibernate.dialect: org.hibernate.dialect.MySQL5Dialect
+            #            hibernate.dialect: org.hibernate.dialect.Oracle10gDialect
+            hibernate.format_sql: true
+            hibernate.max_fetch_depth: 1
+            hibernate.generate_statistics: false
+            hibernate.use_sql_comments: true
+            hibernate.default_schema: jhaudit
+    thymeleaf:
+        mode: HTML
+        encoding: UTF-8
+        cache: false
