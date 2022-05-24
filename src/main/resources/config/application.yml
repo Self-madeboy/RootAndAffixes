@@ -21,7 +21,7 @@ server:
 
 
 
----  #分割线，代表着线以上是一个环境，线一下是一个环
+---
 spring:
     profiles: development-local-test
     datasource:
@@ -68,12 +68,8 @@ spring:
 #    elasticsearch:
 #        rest:
 #            uris: http://100.75.119.104:9200
-swagger:
-    title: 词根词缀
-    description: About English
-    version: 1.0.0
 
----  #分割线，代表着线以上是一个环境，线一下是一个环
+---
 spring:
     profiles: development-local
     datasource:
